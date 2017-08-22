@@ -1,9 +1,9 @@
-name: nanopi-neo
+name: nanopi-air
 version: 16-0.1
-summary: NanoPi NEO
+summary: NanoPi NEO Air
 description: |
  Bootloader files and partitoning data to create a
- bootable Ubuntu Core image for the NanoPi NEO.
+ bootable Ubuntu Core image for the NanoPi NEO Air.
 type: gadget
 architectures:
   - armhf
@@ -17,14 +17,35 @@ parts:
     source-branch: v2017.05
     artifacts: [u-boot-sunxi-with-spl.bin]
     prepare: |
+      set -e
       git apply ../../../uboot.patch
-      make nanopi_neo_defconfig
+      if [ "$(arch)" = "x86_64" ]; then
+        TCHAINVER="$(wget -q -O - \
+                   https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/| \
+                   html2text -width 200|grep 'x86_64_arm-linux-gnueabihf.tar.xz '|cut -d' ' -f2)"
+        wget https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/$TCHAINVER
+        tar xf $TCHAINVER
+        mv $(echo $TCHAINVER|sed 's/.tar.xz$//') toolchain
+        CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make nanopi_neo_air_defconfig
+      else
+        make nanopi_neo_air_defconfig
+      fi
+    build: |
+      set -e
+      if [ "$(arch)" = "x86_64" ]; then
+        CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make
+      else
+        make
+      fi
     install: |
+      set -e
+      cp u-boot-sunxi-with-spl.bin $SNAPCRAFT_PART_INSTALL/
       tools/mkenvimage -r -s 131072 -o $SNAPCRAFT_PART_INSTALL/uboot.env ../../../uboot.env.in
-      cd $SNAPCRAFT_PART_INSTALL/; ln -s uboot.env uboot.conf
+      ln -s uboot.env $SNAPCRAFT_PART_INSTALL/uboot.conf
     build-packages:
-      - libpython2.7-dev
-      - build-essential
       - bc
+      - build-essential
       - device-tree-compiler
+      - libpython2.7-dev
       - python-minimal
+      - wget

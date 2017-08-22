@@ -1,5 +1,24 @@
+diff --git a/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts b/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
+index 3ba081c..b1d8017 100644
+--- a/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
++++ b/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
+@@ -95,3 +95,14 @@
+ 	/* USB VBUS is always on */
+ 	status = "okay";
+ };
++
++&emac {
++	phy = <&phy1>;
++	phy-mode = "mii";
++	allwinner,use-internal-phy;
++	allwinner,leds-active-low;
++	status = "okay";
++	phy1: ethernet-phy@1 {
++		reg = <1>;
++	};
++};
 diff --git a/common/Kconfig b/common/Kconfig
-index 1879aefaf8..4f0d484d3e 100644
+index 1879aef..4f0d484 100644
 --- a/common/Kconfig
 +++ b/common/Kconfig
 @@ -164,7 +164,7 @@ if ARCH_SUNXI
@@ -25,8 +44,20 @@ index 1879aefaf8..4f0d484d3e 100644
  config ENV_IS_IN_NAND
  	bool "Environment in a NAND device"
  	depends on CMD_NAND
+diff --git a/configs/nanopi_neo_air_defconfig b/configs/nanopi_neo_air_defconfig
+index 9598bd5..4f11212 100644
+--- a/configs/nanopi_neo_air_defconfig
++++ b/configs/nanopi_neo_air_defconfig
+@@ -14,4 +14,7 @@ CONFIG_SPL=y
+ # CONFIG_SPL_DOS_PARTITION is not set
+ # CONFIG_SPL_ISO_PARTITION is not set
+ # CONFIG_SPL_EFI_PARTITION is not set
++CONFIG_SUN8I_EMAC=y
+ CONFIG_USB_EHCI_HCD=y
++CONFIG_SYS_CLK_FREQ=480000000
++CONFIG_MMC_SUNXI_SLOT_EXTRA=2
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
-index 64a190059a..d9cc396114 100644
+index 64a1900..d9cc396 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
 @@ -149,8 +149,18 @@

@@ -1,7 +1,7 @@
-device-tree: sun8i-h3-nanopi-neo.dtb
+device-tree: sun8i-h3-nanopi-neo-air.dtb
 device-tree-origin: kernel
 volumes:
-  nanopi-neo:
+  nanopi-air:
     bootloader: u-boot
     schema: mbr
     structure:
