@@ -6,7 +6,7 @@
 This repository contains the source for an Ubuntu Core gadget snap
 for the NanoPi NEO Air. Building it with snapcraft will
 automatically pull, configure, patch and build the git.denx.de/u-boot.git
-upstream source for `nanopi_neo_defconfig` at release `v2017.05` and produce
+upstream source for `nanopi_neo_air_defconfig` at release `v2017.05` and produce
 a bootable gadget snap with the resulting binaries.
 
 ## Gadget Snaps
