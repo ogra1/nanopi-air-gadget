@@ -14,8 +14,8 @@ https://github.com/snapcore/snapd/wiki/Gadget-snap
 
 ## Building
 
-*NOTE: this gadget snap can only build under 17.10 (artful), the sunxi u-boot build
-has a hard requirement on gcc6!*
+*NOTE: this gadget snap can only build under 17.10 (artful) or with a gcc6 cross
+compiler, the sunxi u-boot build has a hard requirement on gcc6!*
 
 ### Natively on armhf
 
@@ -27,13 +27,10 @@ in the toplevel of the tree.
 
 ### Cross on x86 systems
 
-Create an artful (17.10) chroot, install snapcraft and git inside it, chroot into it
-and clone this tree.
-
-Copy the crossbuild-snapcraft.yaml over snapcraft.yaml and run `snapcraft`
+Just run `snapcraft` in the toplevel of the tree, snapcraft will pull the linaro gcc6
+cross compiler into the build environment as needed.
 
 ```
-cp crossbuild-snapcraft.yaml snapcraft.yaml
 snapcraft
 ```
 
