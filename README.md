@@ -1,3 +1,6 @@
+
+[![Snap Status](https://build.snapcraft.io/badge/ogra1/nanopi-air-gadget.svg)](https://build.snapcraft.io/user/ogra1/nanopi-air-gadget)
+
 # NanoPi NEO Air Gadget Snap
 
 This repository contains the source for an Ubuntu Core gadget snap
