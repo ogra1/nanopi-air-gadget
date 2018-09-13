@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+PREREQS=""
+
+prereqs() { echo "$PREREQS"; }
+
+case "$1" in
+    prereqs)
+    prereqs
+    exit 0
+    ;;
+esac
+
+SYSTEMDDIR="/root/writable/system-data/etc/systemd"
+JOBDIR="${SYSTEMDDIR}/system"
+SERVICENAME="getty@ttyGS0.service"
+
+if [ ! -e "/root/writable/system-data/etc/modules-load.d/gserial.conf" ]; then
+  echo "g_serial" >/root/writable/system-data/etc/modules-load.d/gserial.conf
+fi
+
+if [ ! -e "${JOBDIR}/getty.target.wants/${SERVICENAME}" ]; then
+  ln -s "/lib/systemd/system/getty@.service" "${JOBDIR}/getty.target.wants/${SERVICENAME}"
+fi

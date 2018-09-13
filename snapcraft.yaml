@@ -12,11 +12,10 @@ grade: stable
 
 parts:
   uboot:
-    plugin: make
+    plugin: nil
     source: git://git.denx.de/u-boot.git
-    source-branch: v2017.05
-    artifacts: [u-boot-sunxi-with-spl.bin]
-    prepare: |
+    source-branch: v2018.05
+    override-build: |
       set -e
       git apply ../../../uboot.patch
       if [ "$(arch)" = "x86_64" ]; then
@@ -30,15 +29,11 @@ parts:
       else
         make nanopi_neo_air_defconfig
       fi
-    build: |
-      set -e
       if [ "$(arch)" = "x86_64" ]; then
         CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make
       else
         make
       fi
-    install: |
-      set -e
       cp u-boot-sunxi-with-spl.bin $SNAPCRAFT_PART_INSTALL/
       tools/mkenvimage -r -s 131072 -o $SNAPCRAFT_PART_INSTALL/uboot.env ../../../uboot.env.in
       ln -s uboot.env $SNAPCRAFT_PART_INSTALL/uboot.conf
@@ -50,3 +45,15 @@ parts:
       - libpython2.7-dev
       - python-minimal
       - wget
+  initrd-snippet:
+    source: .
+    plugin: nil
+    override-build: |
+      set -e
+      cd initrd && find . | cpio --quiet -o -H newc| lzma >>$SNAPCRAFT_PART_INSTALL/initrd-extra.img
+    build-packages:
+      - cpio
+      - findutils
+      - xz-utils
+      - on amd64 to armhf:
+        - gcc-arm-linux-gnueabihf:amd64

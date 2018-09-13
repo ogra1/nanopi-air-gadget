@@ -1,72 +1,13 @@
-diff --git a/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts b/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
-index 3ba081c..b1d8017 100644
---- a/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
-+++ b/arch/arm/dts/sun8i-h3-nanopi-neo-air.dts
-@@ -95,3 +95,14 @@
- 	/* USB VBUS is always on */
- 	status = "okay";
- };
-+
-+&emac {
-+	phy = <&phy1>;
-+	phy-mode = "mii";
-+	allwinner,use-internal-phy;
-+	allwinner,leds-active-low;
-+	status = "okay";
-+	phy1: ethernet-phy@1 {
-+		reg = <1>;
-+	};
-+};
-diff --git a/common/Kconfig b/common/Kconfig
-index 1879aef..4f0d484 100644
---- a/common/Kconfig
-+++ b/common/Kconfig
-@@ -164,7 +164,7 @@ if ARCH_SUNXI
- 
- choice
- 	prompt "Environment Device"
--	default ENV_IS_IN_MMC if ARCH_SUNXI
-+	default ENV_IS_IN_FAT if ARCH_SUNXI
- 
- config ENV_IS_IN_MMC
- 	bool "Environment in an MMC device"
-@@ -173,6 +173,13 @@ config ENV_IS_IN_MMC
- 	  Define this if you have an MMC device which you want to use for the
- 	  environment.
- 
-+config ENV_IS_IN_FAT
-+	bool "Environment in an FAT device"
-+	depends on CMD_FAT
-+	help
-+	  Define this if you have a FAT device which you want to use for the
-+	  environment.
-+
- config ENV_IS_IN_NAND
- 	bool "Environment in a NAND device"
- 	depends on CMD_NAND
-diff --git a/configs/nanopi_neo_air_defconfig b/configs/nanopi_neo_air_defconfig
-index 9598bd5..4f11212 100644
---- a/configs/nanopi_neo_air_defconfig
-+++ b/configs/nanopi_neo_air_defconfig
-@@ -14,4 +14,7 @@ CONFIG_SPL=y
- # CONFIG_SPL_DOS_PARTITION is not set
- # CONFIG_SPL_ISO_PARTITION is not set
- # CONFIG_SPL_EFI_PARTITION is not set
-+CONFIG_SUN8I_EMAC=y
- CONFIG_USB_EHCI_HCD=y
-+CONFIG_SYS_CLK_FREQ=480000000
-+CONFIG_MMC_SUNXI_SLOT_EXTRA=2
 diff --git a/include/configs/sunxi-common.h b/include/configs/sunxi-common.h
 index 64a1900..d9cc396 100644
 --- a/include/configs/sunxi-common.h
 +++ b/include/configs/sunxi-common.h
-@@ -149,8 +149,18 @@
+@@ -149,8 +149,15 @@
  #define CONFIG_SYS_MMC_MAX_DEVICE	4
  #elif defined(CONFIG_ENV_IS_NOWHERE)
  #define CONFIG_ENV_SIZE			(128 << 10)
 +#elif defined(CONFIG_ENV_IS_IN_FAT)
 +#undef  CONFIG_ENV_SIZE
-+#define CONFIG_FAT_WRITE
 +#define CONFIG_ENV_SIZE			(128 * 1024)
 +#define FAT_ENV_DEVICE_AND_PART         "0:1"
 +#define FAT_ENV_INTERFACE               "mmc"
@@ -74,8 +15,6 @@ index 64a1900..d9cc396 100644
 +#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
  #endif
  
-+#define CONFIG_SUPPORT_RAW_INITRD
-+
  #ifndef CONFIG_MACH_SUN8I_V3S
  /* 64MB of malloc() pool */
  #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (64 << 20))
