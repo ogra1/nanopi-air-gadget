@@ -5,8 +5,11 @@ description: |
  Bootloader files and partitoning data to create a
  bootable Ubuntu Core image for the NanoPi NEO Air.
 type: gadget
+
 architectures:
-  - armhf
+  - build-on: amd64
+    run-on: armhf
+
 confinement: strict
 grade: stable
 
@@ -20,9 +23,9 @@ parts:
       git apply ../../../uboot.patch
       if [ "$(arch)" = "x86_64" ]; then
         TCHAINVER="$(wget -q -O - \
-                   https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/| \
+                   https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/| \
                    html2text -width 200|grep 'x86_64_arm-linux-gnueabihf.tar.xz '|cut -d' ' -f2)"
-        wget https://releases.linaro.org/components/toolchain/binaries/latest/arm-linux-gnueabihf/$TCHAINVER
+        wget https://releases.linaro.org/components/toolchain/binaries/latest-7/arm-linux-gnueabihf/$TCHAINVER
         tar xf $TCHAINVER
         mv $(echo $TCHAINVER|sed 's/.tar.xz$//') toolchain
         CROSS_COMPILE=$(pwd)/toolchain/bin/arm-linux-gnueabihf- make nanopi_neo_air_defconfig
@@ -39,8 +42,10 @@ parts:
       ln -s uboot.env $SNAPCRAFT_PART_INSTALL/uboot.conf
     build-packages:
       - bc
+      - bison
       - build-essential
       - device-tree-compiler
+      - flex
       - html2text
       - libpython2.7-dev
       - python-minimal
@@ -52,8 +57,8 @@ parts:
       set -e
       cd initrd && find . | cpio --quiet -o -H newc| lzma >>$SNAPCRAFT_PART_INSTALL/initrd-extra.img
     build-packages:
+      - ttf-ubuntu-font-family
       - cpio
       - findutils
       - xz-utils
-      - on amd64 to armhf:
-        - gcc-arm-linux-gnueabihf:amd64
+      - gcc-arm-linux-gnueabihf
