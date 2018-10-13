@@ -49,6 +49,7 @@ parts:
       - html2text
       - libpython2.7-dev
       - python-minimal
+      - swig
       - wget
   initrd-snippet:
     source: .
